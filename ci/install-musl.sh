@@ -83,7 +83,7 @@ case ${1} in
     powerpc64*)
         musl_arch=powerpc64
         kernel_arch=powerpc
-        CC="${1}-linux-gnu-gcc" CFLAGS="-mlong-double-64" \
+        CC="${1}-linux-gnu-gcc" CFLAGS="-mlong-double-64 -mabi=elfv2" LIBCC="/compiler_builtins.rlib" \
             ./configure --prefix="/musl-${musl_arch}" --enable-wrapper=yes
         make install -j4
         ;;

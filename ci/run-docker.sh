@@ -53,6 +53,12 @@ run() {
         export RUSTFLAGS="$RUSTFLAGS --cfg=libc_unstable_uclibc_time64"
     fi
 
+    rust_sysroot=$(rustc --print sysroot)
+    compiler_builtins=$(find "$rust_sysroot/lib/rustlib/$run_target" -name "libcompiler_builtins*.rlib")
+    if [ -n "$compiler_builtins" ]; then
+        build_args+=("-v=$compiler_builtins:/compiler_builtins.rlib:ro,Z")
+    fi
+
     # use -f so we can use ci/ as build context
     docker build "${build_args[@]}"
 
@@ -76,7 +82,7 @@ run() {
         --env CARGO_HOME=/cargo \
         --env CARGO_TARGET_DIR=/checkout/target \
         --volume "$CARGO_HOME":/cargo:Z \
-        --volume "$(rustc --print sysroot)":/rust:ro,Z \
+        --volume "$rust_sysroot":/rust:ro,Z \
         --volume "$PWD":/checkout:ro,Z \
         --volume "$PWD"/target:/checkout/target \
         $kvm \
